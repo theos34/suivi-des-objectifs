@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Suivi des Objectifs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+      body, input, select, button, label, h2 {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+      }
+      tr:not(:last-child) {
+        border-bottom: 1px solid #e0e0e0;
+      }
+      tr:hover {
+        background-color: #f4f4f5;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #f4f4f5;
+        border-radius: 4px;
+      }
+      table {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-radius: 16px;
+      }
+    </style>
+    <script>
+      let objectiveCount = 0;
+      let objectives = [];
+
+      function openAddPopup() {
+        document.getElementById('popup').classList.remove('hidden');
+        document.getElementById('popupTitle').innerText = 'Ajouter un Objectif';
+        document.getElementById('objectiveNameInput').value = '';
+        document.getElementById('currentValue').value = '';
+        document.getElementById('objectiveGoal').value = '';
+        document.getElementById('objectiveType').disabled = false;
+        document.getElementById('popupSaveButton').setAttribute('onclick', 'addObjective()');
+      }
+
+      function addObjective() {
+        const objectiveType = document.getElementById('objectiveType').value;
+        const newObjective = document.getElementById('objectiveNameInput').value || 'Nouvel Objectif';
+        const newValue = parseInt(document.getElementById('currentValue').value);
+        const goalValue = parseInt(document.getElementById('objectiveGoal').value) || 1000;
+
+        objectiveCount++;
+
+        objectives.push({
+          id: objectiveCount,
+          type: objectiveType,
+          name: newObjective,
+          current: newValue,
+          goal: goalValue
+        });
+
+        saveToLocalStorage();
+        renderObjectives();
+        closePopup();
+      }
+
+      function renderObjectives() {
+        document.getElementById('objectiveTableBody').innerHTML = '';
+        document.getElementById('quarterlyObjectives').innerHTML = '';
+        document.getElementById('annualObjectives').innerHTML = '';
+
+        objectives.forEach(obj => {
+          let progressValue = Math.min((obj.current / obj.goal) * 100, 100);
+
+          const newRow = `
+            <tr id="row${obj.id}">
+              <td class="h-[72px] px-4 py-2 w-[400px] text-sm">${obj.name}</td>
+              <td id="achieve${obj.id}" class="h-[72px] px-4 py-2 w-[400px] text-sm">${obj.current} € / ${obj.goal} €</td>
+              <td class="h-[72px] px-4 py-2 w-[400px] text-sm">
+                <div class="flex items-center gap-3">
+                  <div class="w-[88px] overflow-hidden rounded-sm bg-[#e0e0e0]">
+                    <div id="bar${obj.id}" class="h-1 rounded-full ${getProgressColor(progressValue)}" style="width: ${progressValue}%; transition: width 0.5s ease-in-out;"></div>
+                  </div>
+                  <p id="progress${obj.id}" class="text-sm font-medium">${Math.round(progressValue)}%</p>
+                </div>
+              </td>
+              <td class="h-[72px] px-4 py-2 w-60 text-sm font-bold flex gap-2">
+                <button onclick="openEditPopup(${obj.id})" class="text-blue-600 font-bold flex items-center gap-1 text-lg">
+                  ✏️
+                </button>
+                <button onclick="deleteObjective(${obj.id})" class="text-red-600 font-bold flex items-center gap-1 text-lg">
+                  ❌
+                </button>
+              </td>
+            </tr>
+          `;
+
+          if (obj.type === 'monthly') {
+            document.getElementById('objectiveTableBody').insertAdjacentHTML('beforeend', newRow);
+          } else if (obj.type === 'quarterly') {
+            document.getElementById('quarterlyObjectives').insertAdjacentHTML('beforeend', newRow);
+          } else if (obj.type === 'annual') {
+            document.getElementById('annualObjectives').insertAdjacentHTML('beforeend', newRow);
+          }
+        });
+      }
+
+      function getProgressColor(progress) {
+        if (progress < 20) return 'bg-red-500';
+        if (progress < 60) return 'bg-orange-400';
+        if (progress < 80) return 'bg-green-400';
+        return 'bg-lime-300';
+      }
+
+      function deleteObjective(id) {
+        objectives = objectives.filter(obj => obj.id !== id);
+        saveToLocalStorage();
+        renderObjectives();
+      }
+
+      function openEditPopup(id) {
+        const obj = objectives.find(o => o.id === id);
+
+        document.getElementById('popup').classList.remove('hidden');
+        document.getElementById('popupTitle').innerText = 'Modifier l\'Objectif';
+        document.getElementById('objectiveNameInput').value = obj.name;
+        document.getElementById('currentValue').value = obj.current;
+        document.getElementById('objectiveGoal').value = obj.goal;
+        document.getElementById('objectiveType').disabled = true;
+        document.getElementById('popupSaveButton').setAttribute('onclick', `saveObjective(${id})`);
+      }
+
+      function saveObjective(id) {
+        const obj = objectives.find(o => o.id === id);
+
+        obj.name = document.getElementById('objectiveNameInput').value;
+        obj.current = parseInt(document.getElementById('currentValue').value);
+        obj.goal = parseInt(document.getElementById('objectiveGoal').value) || 1000;
+
+        saveToLocalStorage();
+        renderObjectives();
+        closePopup();
+      }
+
+      function closePopup() {
+        document.getElementById('popup').classList.add('hidden');
+      }
+
+      function saveToLocalStorage() {
+        localStorage.setItem('goalsData', JSON.stringify({ objectiveCount, objectives }));
+      }
+
+      function loadFromLocalStorage() {
+        const savedData = JSON.parse(localStorage.getItem('goalsData'));
+        if (savedData) {
+          objectiveCount = savedData.objectiveCount;
+          objectives = savedData.objectives;
+          renderObjectives();
+        }
+      }
+
+      function createGoogleCalendarLink(frequency) {
+        const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+        let text = '';
+
+        if (frequency === 'monthly') {
+          text = encodeURIComponent('Revoir mes objectifs - Mensuel');
+        } else if (frequency === 'quarterly') {
+          text = encodeURIComponent('Revoir mes objectifs - Trimestriel');
+        } else if (frequency === 'annual') {
+          text = encodeURIComponent('Revoir mes objectifs - Annuel');
+        }
+
+        let recurrence = '';
+        let startDate;
+
+        const now = new Date();
+        if (frequency === 'monthly') {
+          startDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          recurrence = '&recur=RRULE:FREQ=MONTHLY;BYMONTHDAY=1';
+        } else if (frequency === 'quarterly') {
+          let nextQuarterMonth = now.getMonth() + (3 - (now.getMonth() % 3));
+          if (nextQuarterMonth > 11) {
+            nextQuarterMonth = 0;
+            startDate = new Date(now.getFullYear() + 1, 0, 1);
+          } else {
+            startDate = new Date(now.getFullYear(), nextQuarterMonth, 1);
+          }
+          recurrence = '&recur=RRULE:FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=1';
+        } else if (frequency === 'annual') {
+          startDate = new Date(now.getFullYear() + 1, 0, 1);
+          recurrence = '&recur=RRULE:FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1';
+        }
+
+        const start = startDate.toISOString().replace(/-|:|\..+/g, '').slice(0, 15) + '00Z';
+        const end = startDate.toISOString().replace(/-|:|\..+/g, '').slice(0, 15) + '30Z';
+
+        const url = `${baseUrl}&text=${text}&dates=${start}/${end}${recurrence}`;
+        window.open(url, '_blank');
+      }
+
+      window.onload = function() {
+        loadFromLocalStorage();
+      }
+    </script>
+  </head>
+  <body class="font-sans bg-white">
+    <header class="flex items-center justify-between border-b border-[#f2f2f2] px-10 py-3">
+      <h2 class="text-lg font-bold tracking-[-0.015em]">Suivi des Objectifs</h2>
+      <a href="https://bento.me/theoserra" target="_blank" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm">Suivre le Créateur</a>
+    </header>
+
+    <div class="px-40 flex flex-1 justify-center py-5">
+      <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <div class="flex flex-wrap justify-between gap-3 p-4">
+          <div class="flex min-w-72 flex-col gap-3">
+            <p class="text-[32px] font-bold leading-tight">Mes Objectifs</p>
+            <p class="text-[#757575] text-sm leading-normal">Suivez vos progrès mensuels, trimestriels et annuels.</p>
+          </div>
+          <button onclick="openAddPopup()" class="bg-blue-500 text-white px-2 py-0.5 h-8 rounded text-sm font-bold">Ajouter un Objectif</button>
+        </div>
+
+        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Mensuels</h2>
+        <div class="px-4 py-3">
+          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
+            <thead>
+              <tr class="bg-white">
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
+              </tr>
+            </thead>
+            <tbody id="objectiveTableBody"></tbody>
+          </table>
+        </div>
+
+        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Trimestriels</h2>
+        <div class="px-4 py-3">
+          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
+            <thead>
+              <tr class="bg-white">
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
+              </tr>
+            </thead>
+            <tbody id="quarterlyObjectives"></tbody>
+          </table>
+        </div>
+
+        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Annuels</h2>
+        <div class="px-4 py-3">
+          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
+            <thead>
+              <tr class="bg-white">
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
+              </tr>
+            </thead>
+            <tbody id="annualObjectives"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg w-96">
+        <h2 id="popupTitle" class="text-xl font-bold mb-4">Modifier l'Objectif</h2>
+        <label class="block mb-2">Titre de l'Objectif :</label>
+        <input id="objectiveNameInput" type="text" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <label class="block mb-2">Type d'Objectif :</label>
+        <select id="objectiveType" class="border p-2 w-full mb-4 rounded-lg">
+          <option value="monthly">Mensuel</option>
+          <option value="quarterly">Trimestriel</option>
+          <option value="annual">Annuel</option>
+        </select>
+
+        <label class="block mb-2">Réalisé (€) :</label>
+        <input id="currentValue" type="number" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <label class="block mb-2">Objectif à Atteindre (€) :</label>
+        <input id="objectiveGoal" type="number" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <div class="flex justify-end gap-4">
+          <button onclick="closePopup()" class="bg-gray-300 px-4 py-2 rounded">Annuler</button>
+          <button id="popupSaveButton" class="bg-blue-500 text-white px-4 py-2 rounded">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fixed bottom-6 right-6 flex flex-col gap-3">
+      <button onclick="createGoogleCalendarLink('monthly')" class="bg-green-500 text-white px-4 py-2 rounded-lg">+ Invitation Mensuel</button>
+      <button onclick="createGoogleCalendarLink('quarterly')" class="bg-yellow-500 text-white px-4 py-2 rounded-lg">+ Invitation Trimestriel</button>
+      <button onclick="createGoogleCalendarLink('annual')" class="bg-blue-500 text-white px-4 py-2 rounded-lg">+ Invitation Annuel</button>
+    </div>
+  </body>
+</html>
