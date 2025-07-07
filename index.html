@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-          <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-X08X9D80TZ"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-X08X9D80TZ');
-      </script>
     <meta charset="UTF-8" />
     <title>Suivi des Objectifs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X08X9D80TZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-X08X9D80TZ');
+    </script>
     <style>
       body, input, select, button, label, h2 {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -35,6 +35,106 @@
         border-radius: 16px;
       }
     </style>
+  </head>
+  <body class="font-sans bg-white">
+    <header class="flex items-center justify-between border-b border-[#f2f2f2] px-10 py-3">
+      <h2 class="text-lg font-bold tracking-[-0.015em]">Suivi des Objectifs</h2>
+      <nav class="flex gap-6">
+        <a href="index.html" class="text-sm font-medium hover:underline">Mes Objectifs</a>
+        <a href="revenus.html" class="text-sm font-medium hover:underline">Revenus</a>
+      </nav>
+      <a href="https://bento.me/theoserra" target="_blank" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm">Suivre le Créateur</a>
+    </header>
+
+    <div class="px-40 flex flex-1 justify-center py-5">
+      <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <div class="flex flex-wrap justify-between gap-3 p-4">
+          <div class="flex min-w-72 flex-col gap-3">
+            <p class="text-[32px] font-bold leading-tight">Mes Objectifs</p>
+            <p class="text-[#757575] text-sm leading-normal">Suivez vos progrès mensuels, trimestriels et annuels.</p>
+          </div>
+          <button onclick="openAddPopup()" class="bg-blue-500 text-white px-2 py-0.5 h-8 rounded text-sm font-bold">Ajouter un Objectif</button>
+        </div>
+
+        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Mensuels</h2>
+        <div class="px-4 py-3">
+          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
+            <thead>
+              <tr class="bg-white">
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
+              </tr>
+            </thead>
+            <tbody id="objectiveTableBody"></tbody>
+          </table>
+        </div>
+
+        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Trimestriels</h2>
+        <div class="px-4 py-3">
+          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
+            <thead>
+              <tr class="bg-white">
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
+              </tr>
+            </thead>
+            <tbody id="quarterlyObjectives"></tbody>
+          </table>
+        </div>
+
+        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Annuels</h2>
+        <div class="px-4 py-3">
+          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
+            <thead>
+              <tr class="bg-white">
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
+                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
+              </tr>
+            </thead>
+            <tbody id="annualObjectives"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg w-96">
+        <h2 id="popupTitle" class="text-xl font-bold mb-4">Modifier l'Objectif</h2>
+        <label class="block mb-2">Titre de l'Objectif :</label>
+        <input id="objectiveNameInput" type="text" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <label class="block mb-2">Type d'Objectif :</label>
+        <select id="objectiveType" class="border p-2 w-full mb-4 rounded-lg">
+          <option value="monthly">Mensuel</option>
+          <option value="quarterly">Trimestriel</option>
+          <option value="annual">Annuel</option>
+        </select>
+
+        <label class="block mb-2">Réalisé (€) :</label>
+        <input id="currentValue" type="number" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <label class="block mb-2">Objectif à Atteindre (€) :</label>
+        <input id="objectiveGoal" type="number" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <div class="flex justify-end gap-4">
+          <button onclick="closePopup()" class="bg-gray-300 px-4 py-2 rounded">Annuler</button>
+          <button id="popupSaveButton" class="bg-blue-500 text-white px-4 py-2 rounded">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fixed bottom-6 right-6 flex flex-col gap-3">
+      <button onclick="createGoogleCalendarLink('monthly')" class="bg-green-500 text-white px-4 py-2 rounded-lg">+ Rappel Mensuel</button>
+      <button onclick="createGoogleCalendarLink('quarterly')" class="bg-yellow-500 text-white px-4 py-2 rounded-lg">+ Rappel Trimestriel</button>
+      <button onclick="createGoogleCalendarLink('annual')" class="bg-blue-500 text-white px-4 py-2 rounded-lg">+ Rappel Annuel</button>
+    </div>
+
     <script>
       let objectiveCount = 0;
       let objectives = [];
@@ -91,12 +191,8 @@
                 </div>
               </td>
               <td class="h-[72px] px-4 py-2 w-60 text-sm font-bold flex gap-2">
-                <button onclick="openEditPopup(${obj.id})" class="text-blue-600 font-bold flex items-center gap-1 text-lg">
-                  ✏️
-                </button>
-                <button onclick="deleteObjective(${obj.id})" class="text-red-600 font-bold flex items-center gap-1 text-lg">
-                  ❌
-                </button>
+                <button onclick="openEditPopup(${obj.id})" class="text-blue-600 font-bold flex items-center gap-1 text-lg">✏️</button>
+                <button onclick="deleteObjective(${obj.id})" class="text-red-600 font-bold flex items-center gap-1 text-lg">❌</button>
               </td>
             </tr>
           `;
@@ -198,7 +294,7 @@
           recurrence = '&recur=RRULE:FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1';
         }
 
-        const start = startDate.toISOString().replace(/-|:|\..+/g, '').slice(0, 15) + '00Z';
+      const start = startDate.toISOString().replace(/-|:|\..+/g, '').slice(0, 15) + '00Z';
         const end = startDate.toISOString().replace(/-|:|\..+/g, '').slice(0, 15) + '30Z';
 
         const url = `${baseUrl}&text=${text}&dates=${start}/${end}${recurrence}`;
@@ -209,100 +305,7 @@
         loadFromLocalStorage();
       }
     </script>
-  </head>
-  <body class="font-sans bg-white">
-    <header class="flex items-center justify-between border-b border-[#f2f2f2] px-10 py-3">
-      <h2 class="text-lg font-bold tracking-[-0.015em]">Suivi des Objectifs</h2>
-      <a href="https://bento.me/theoserra" target="_blank" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm">Suivre le Créateur</a>
-    </header>
 
-    <div class="px-40 flex flex-1 justify-center py-5">
-      <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-        <div class="flex flex-wrap justify-between gap-3 p-4">
-          <div class="flex min-w-72 flex-col gap-3">
-            <p class="text-[32px] font-bold leading-tight">Mes Objectifs</p>
-            <p class="text-[#757575] text-sm leading-normal">Suivez vos progrès mensuels, trimestriels et annuels.</p>
-          </div>
-          <button onclick="openAddPopup()" class="bg-blue-500 text-white px-2 py-0.5 h-8 rounded text-sm font-bold">Ajouter un Objectif</button>
-        </div>
-
-        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Mensuels</h2>
-        <div class="px-4 py-3">
-          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
-            <thead>
-              <tr class="bg-white">
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
-              </tr>
-            </thead>
-            <tbody id="objectiveTableBody"></tbody>
-          </table>
-        </div>
-
-        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Trimestriels</h2>
-        <div class="px-4 py-3">
-          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
-            <thead>
-              <tr class="bg-white">
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
-              </tr>
-            </thead>
-            <tbody id="quarterlyObjectives"></tbody>
-          </table>
-        </div>
-
-        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Objectifs Annuels</h2>
-        <div class="px-4 py-3">
-          <table class="flex-1 w-full border border-[#e0e0e0] rounded-xl overflow-hidden bg-white border-separate border-spacing-0">
-            <thead>
-              <tr class="bg-white">
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Objectif</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Réalisé</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-[400px] border-b border-[#e0e0e0]">Progression</th>
-                <th class="px-4 py-3 text-left text-sm font-medium w-60 border-b border-[#e0e0e0]"></th>
-              </tr>
-            </thead>
-            <tbody id="annualObjectives"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded-lg w-96">
-        <h2 id="popupTitle" class="text-xl font-bold mb-4">Modifier l'Objectif</h2>
-        <label class="block mb-2">Titre de l'Objectif :</label>
-        <input id="objectiveNameInput" type="text" class="border p-2 w-full mb-4 rounded-lg" />
-
-        <label class="block mb-2">Type d'Objectif :</label>
-        <select id="objectiveType" class="border p-2 w-full mb-4 rounded-lg">
-          <option value="monthly">Mensuel</option>
-          <option value="quarterly">Trimestriel</option>
-          <option value="annual">Annuel</option>
-        </select>
-
-        <label class="block mb-2">Réalisé (€) :</label>
-        <input id="currentValue" type="number" class="border p-2 w-full mb-4 rounded-lg" />
-
-        <label class="block mb-2">Objectif à Atteindre (€) :</label>
-        <input id="objectiveGoal" type="number" class="border p-2 w-full mb-4 rounded-lg" />
-
-        <div class="flex justify-end gap-4">
-          <button onclick="closePopup()" class="bg-gray-300 px-4 py-2 rounded">Annuler</button>
-          <button id="popupSaveButton" class="bg-blue-500 text-white px-4 py-2 rounded">Enregistrer</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="fixed bottom-6 right-6 flex flex-col gap-3">
-      <button onclick="createGoogleCalendarLink('monthly')" class="bg-green-500 text-white px-4 py-2 rounded-lg">+ Rappel Mensuel</button>
-      <button onclick="createGoogleCalendarLink('quarterly')" class="bg-yellow-500 text-white px-4 py-2 rounded-lg">+ Rappel Trimestriel</button>
-      <button onclick="createGoogleCalendarLink('annual')" class="bg-blue-500 text-white px-4 py-2 rounded-lg">+ Rappel Annuel</button>
-    </div>
   </body>
 </html>
+
