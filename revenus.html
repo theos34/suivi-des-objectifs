@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Revenus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="font-sans bg-white">
+    <header class="flex items-center justify-between border-b border-[#f2f2f2] px-10 py-3">
+      <h2 class="text-lg font-bold tracking-[-0.015em]">Suivi des Objectifs</h2>
+      <nav class="flex gap-6">
+        <a href="index.html" class="text-sm font-medium hover:underline">Mes Objectifs</a>
+        <a href="revenus.html" class="text-sm font-medium hover:underline">Revenus</a>
+      </nav>
+      <a href="https://bento.me/theoserra" target="_blank" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm">Suivre le Créateur</a>
+    </header>
+
+    <div class="px-40 flex flex-1 justify-center py-5">
+      <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <div class="flex flex-wrap justify-between gap-3 p-4">
+          <p class="text-[#0d151c] tracking-light text-[32px] font-bold leading-tight min-w-72">Aperçu des revenus mensuels</p>
+          <button onclick="openAddPopup()" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#e7edf4] text-[#0d151c] text-sm font-medium leading-normal">
+            <span class="truncate">Ajouter un revenu</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-4 px-4 py-6">
+          <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl border border-[#cedce8] p-6">
+            <p class="text-[#0d151c] text-base font-medium leading-normal">Tendance des revenus</p>
+            <p id="totalRevenue" class="text-[#0d151c] tracking-light text-[32px] font-bold leading-tight truncate">0 €</p>
+            <p class="text-[#49749c] text-base font-normal leading-normal">6 derniers mois</p>
+            <div id="chartContainer" class="grid min-h-[400px] grid-flow-col gap-6 grid-rows-[1fr_auto_auto] items-end justify-items-center px-3"></div>
+          </div>
+        </div>
+
+        <h3 class="text-[#0d151c] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Récapitulatif des revenus mensuels</h3>
+
+        <div class="px-4 py-3 @container">
+          <div class="flex overflow-hidden rounded-xl border border-[#cedce8] bg-slate-50">
+            <table class="flex-1" id="revenuTable">
+              <thead>
+                <tr class="bg-slate-50">
+                  <th class="px-4 py-3 text-left text-[#0d151c] w-[200px] text-sm font-medium leading-normal">Mois</th>
+                  <th class="px-4 py-3 text-left text-[#0d151c] w-[200px] text-sm font-medium leading-normal">Montant</th>
+                  <th class="px-4 py-3 text-left text-[#0d151c] w-[400px] text-sm font-medium leading-normal">Description</th>
+                  <th class="px-4 py-3 text-left text-[#0d151c] w-[200px] text-sm font-medium leading-normal">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="revenuTableBody"></tbody>
+            </table>
+          </div>
+
+          <style>
+            @container(max-width:120px){
+              th:nth-child(1), td:nth-child(1) {display: none;}
+            }
+            @container(max-width:240px){
+              th:nth-child(2), td:nth-child(2) {display: none;}
+            }
+          </style>
+        </div>
+      </div>
+    </div>
+
+    <div id="popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg w-96">
+        <h2 id="popupTitle" class="text-xl font-bold mb-4">Ajouter un Revenu</h2>
+        <label class="block mb-2">Mois :</label>
+        <input id="monthInput" type="text" placeholder="Ex: Janvier" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <label class="block mb-2">Montant (€) :</label>
+        <input id="amountInput" type="number" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <label class="block mb-2">Description :</label>
+        <input id="descriptionInput" type="text" class="border p-2 w-full mb-4 rounded-lg" />
+
+        <div class="flex justify-end gap-4">
+          <button onclick="closePopup()" class="bg-gray-300 px-4 py-2 rounded">Annuler</button>
+          <button id="saveButton" onclick="addRevenue()" class="bg-blue-500 text-white px-4 py-2 rounded">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let revenues = [];
+
+      function openAddPopup(index = -1) {
+        document.getElementById('popup').classList.remove('hidden');
+        if (index >= 0) {
+          document.getElementById('popupTitle').innerText = 'Modifier le Revenu';
+          document.getElementById('monthInput').value = revenues[index].month;
+          document.getElementById('amountInput').value = revenues[index].amount;
+          document.getElementById('descriptionInput').value = revenues[index].description;
+          document.getElementById('saveButton').setAttribute('onclick', `saveRevenue(${index})`);
+        } else {
+          document.getElementById('popupTitle').innerText = 'Ajouter un Revenu';
+          document.getElementById('saveButton').setAttribute('onclick', 'addRevenue()');
+        }
+      }
+
+      function closePopup() {
+        document.getElementById('popup').classList.add('hidden');
+      }
+
+      function addRevenue() {
+        const month = document.getElementById('monthInput').value;
+        const amount = parseFloat(document.getElementById('amountInput').value);
+        const description = document.getElementById('descriptionInput').value;
+
+        revenues.push({ month, amount, description });
+        renderRevenues();
+        closePopup();
+      }
+
+      function saveRevenue(index) {
+        revenues[index].month = document.getElementById('monthInput').value;
+        revenues[index].amount = parseFloat(document.getElementById('amountInput').value);
+        revenues[index].description = document.getElementById('descriptionInput').value;
+
+        renderRevenues();
+        closePopup();
+      }
+
+      function deleteRevenue(index) {
+        revenues.splice(index, 1);
+        renderRevenues();
+      }
+
+      function renderRevenues() {
+        const tbody = document.getElementById('revenuTableBody');
+        tbody.innerHTML = '';
+
+        const chartContainer = document.getElementById('chartContainer');
+        chartContainer.innerHTML = '';
+
+        let total = 0;
+        let maxAmount = Math.max(...revenues.map(rev => rev.amount), 1000);
+
+        revenues.forEach((rev, index) => {
+          total += rev.amount;
+
+          const row = document.createElement('tr');
+
+          const monthCell = document.createElement('td');
+          monthCell.className = 'h-[72px] px-4 py-2 w-[200px] text-[#0d151c] text-sm font-normal leading-normal';
+          monthCell.innerText = rev.month;
+
+          const amountCell = document.createElement('td');
+          amountCell.className = 'h-[72px] px-4 py-2 w-[200px] text-sm font-normal leading-normal';
+          amountCell.innerText = rev.amount + ' €';
+          if (rev.amount > 4000) {
+            amountCell.classList.add('text-green-500', 'font-bold');
+          } else {
+            amountCell.classList.add('text-[#49749c]');
+          }
+
+          const descCell = document.createElement('td');
+          descCell.className = 'h-[72px] px-4 py-2 w-[400px] text-[#0d151c] text-sm font-normal leading-normal';
+          descCell.innerText = rev.description;
+
+          const actionCell = document.createElement('td');
+          actionCell.className = 'h-[72px] px-4 py-2 w-[200px] text-sm font-normal leading-normal flex gap-2';
+          actionCell.innerHTML = `
+            <button onclick="openAddPopup(${index})" class="text-blue-500 font-bold"><i data-lucide="edit" class="w-5 h-5"></i></button>
+            <button onclick="deleteRevenue(${index})" class="text-red-500 font-bold"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+          `;
+
+          row.appendChild(monthCell);
+          row.appendChild(amountCell);
+          row.appendChild(descCell);
+          row.appendChild(actionCell);
+
+          tbody.appendChild(row);
+
+          const bar = document.createElement('div');
+          bar.className = rev.amount > 4000 ? 'border-green-500 bg-green-300 border-t-2 w-full' : 'border-[#49749c] bg-[#e7edf4] border-t-2 w-full';
+          bar.style.height = Math.min((rev.amount / maxAmount) * 300, 90) + '%';
+          bar.style.transition = 'height 0.5s ease-in-out';
+          bar.style.transition = 'height 0.5s ease-in-out';
+          chartContainer.appendChild(bar);
+
+          const label = document.createElement('p');
+          label.className = 'text-[#49749c] text-[13px] font-bold leading-normal tracking-[0.015em]';
+          label.innerText = rev.month;
+          chartContainer.appendChild(label);
+
+          const valueLabel = document.createElement('p');
+          valueLabel.className = 'text-[#0d151c] text-[12px] font-medium leading-normal';
+          valueLabel.innerText = rev.amount + ' €';
+          chartContainer.appendChild(valueLabel);
+        });
+
+        document.getElementById('totalRevenue').innerText = total + ' €';
+        lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>
