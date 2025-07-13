@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Estimation Revenus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body class="font-sans bg-white text-[#121416]">
+    <header class="flex items-center justify-between border-b border-[#f2f2f2] px-10 py-3">
+      <h2 class="text-lg font-bold tracking-[-0.015em]">Suivi des Objectifs</h2>
+      <nav class="flex gap-6">
+        <a href="index.html" class="text-sm font-medium hover:underline">Mes Objectifs</a>
+        <a href="revenus.html" class="text-sm font-medium hover:underline">Revenus</a>
+        <a href="estimation-revenus.html" class="text-sm font-medium hover:underline">Estimation Revenus</a>
+      </nav>
+      <a href="https://bento.me/theoserra" target="_blank" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm">Suivre le Créateur</a>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center p-6">
+      <div class="bg-white rounded-2xl border border-[#dde1e3] w-full max-w-md p-6 space-y-4">
+        <h1 class="text-2xl font-bold text-center">Estimez vos revenus</h1>
+        <input
+          id="business-name"
+          type="text"
+          placeholder="Nom du Business"
+          class="border border-[#dde1e3] rounded-xl p-3 focus:ring-2 focus:ring-[#dce8f3] focus:outline-none w-full"
+        />
+        <input
+          id="panier-moyen"
+          type="number"
+          placeholder="Panier Moyen (€)"
+          class="border border-[#dde1e3] rounded-xl p-3 focus:ring-2 focus:ring-[#dce8f3] focus:outline-none w-full"
+        />
+        <input
+          id="clients"
+          type="number"
+          placeholder="Nombre de Clients"
+          class="border border-[#dde1e3] rounded-xl p-3 focus:ring-2 focus:ring-[#dce8f3] focus:outline-none w-full"
+        />
+        <button
+          id="calculate-btn"
+          class="bg-[#1d4ed8] hover:bg-[#2563eb] text-white rounded-full py-3 font-bold transition duration-200 w-full"
+        >
+          Calculer
+        </button>
+      </div>
+
+      <div class="w-full max-w-2xl mt-10">
+        <div class="overflow-hidden rounded-2xl border border-[#dde1e3] bg-white">
+          <table class="w-full border-collapse text-left">
+            <thead class="bg-[#f1f2f4]">
+              <tr>
+                <th class="p-3 font-medium">Nom du Business</th>
+                <th class="p-3 font-medium">Panier Moyen (€)</th>
+                <th class="p-3 font-medium">Clients</th>
+                <th class="p-3 font-medium">Revenus (€)</th>
+                <th class="p-3 font-medium">Action</th>
+              </tr>
+            </thead>
+            <tbody id="results-body" class="divide-y divide-[#dde1e3]">
+              <!-- Rows dynamiques -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.getElementById('calculate-btn').addEventListener('click', () => {
+        const businessName = document.getElementById('business-name').value.trim() || "Mon Business";
+        const panier = parseFloat(document.getElementById('panier-moyen').value);
+        const clients = parseInt(document.getElementById('clients').value);
+
+        if (isNaN(panier) || isNaN(clients) || panier <= 0 || clients <= 0) {
+          alert("Merci de saisir des valeurs valides.");
+          return;
+        }
+
+        const revenus = (panier * clients).toFixed(2);
+
+        const row = document.createElement('tr');
+        row.className = "hover:bg-[#f9fafb] transition";
+
+        row.innerHTML = `
+          <td class="p-3">${businessName}</td>
+          <td class="p-3">${panier.toFixed(2)}</td>
+          <td class="p-3">${clients}</td>
+          <td class="p-3 font-bold">${revenus}</td>
+          <td class="p-3">
+            <button class="text-red-500 hover:text-red-700 font-bold remove-btn">🗑️</button>
+          </td>
+        `;
+
+        row.querySelector('.remove-btn').addEventListener('click', () => {
+          row.remove();
+        });
+
+        document.getElementById('results-body').appendChild(row);
+      });
+    </script>
+  </body>
+</html>
