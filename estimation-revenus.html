@@ -67,38 +67,70 @@
       </div>
     </main>
 
-    <script>
-      document.getElementById('calculate-btn').addEventListener('click', () => {
-        const businessName = document.getElementById('business-name').value.trim() || "Mon Business";
-        const panier = parseFloat(document.getElementById('panier-moyen').value);
-        const clients = parseInt(document.getElementById('clients').value);
+   <script>
+  let savedEstimations = [];
 
-        if (isNaN(panier) || isNaN(clients) || panier <= 0 || clients <= 0) {
-          alert("Merci de saisir des valeurs valides.");
-          return;
-        }
+  // Charger les données au démarrage
+  window.onload = function () {
+    const stored = localStorage.getItem('estimationsData');
+    if (stored) {
+      savedEstimations = JSON.parse(stored);
+      renderEstimations();
+    }
+  };
 
-        const revenus = (panier * clients).toFixed(2);
+  document.getElementById('calculate-btn').addEventListener('click', () => {
+    const businessName = document.getElementById('business-name').value.trim() || "Mon Business";
+    const panier = parseFloat(document.getElementById('panier-moyen').value);
+    const clients = parseInt(document.getElementById('clients').value);
 
-        const row = document.createElement('tr');
-        row.className = "hover:bg-[#f9fafb] transition";
+    if (isNaN(panier) || isNaN(clients) || panier <= 0 || clients <= 0) {
+      alert("Merci de saisir des valeurs valides.");
+      return;
+    }
 
-        row.innerHTML = `
-          <td class="p-3">${businessName}</td>
-          <td class="p-3">${panier.toFixed(2)}</td>
-          <td class="p-3">${clients}</td>
-          <td class="p-3 font-bold">${revenus}</td>
-          <td class="p-3">
-            <button class="text-red-500 hover:text-red-700 font-bold remove-btn">🗑️</button>
-          </td>
-        `;
+    const revenus = (panier * clients).toFixed(2);
 
-        row.querySelector('.remove-btn').addEventListener('click', () => {
-          row.remove();
-        });
+    const estimation = { businessName, panier: panier.toFixed(2), clients, revenus };
+    savedEstimations.push(estimation);
+    saveEstimations();
+    renderEstimations();
+  });
 
-        document.getElementById('results-body').appendChild(row);
+  function renderEstimations() {
+    const tbody = document.getElementById('results-body');
+    tbody.innerHTML = '';
+
+    savedEstimations.forEach((item, index) => {
+      const row = document.createElement('tr');
+      row.className = "hover:bg-[#f9fafb] transition";
+      row.innerHTML = `
+        <td class="p-3">${item.businessName}</td>
+        <td class="p-3">${item.panier}</td>
+        <td class="p-3">${item.clients}</td>
+        <td class="p-3 font-bold">${item.revenus}</td>
+        <td class="p-3">
+          <button class="text-red-500 hover:text-red-700 font-bold remove-btn" data-index="${index}">🗑️</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    // Attacher les events remove après render complet
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = e.target.dataset.index;
+        savedEstimations.splice(idx, 1);
+        saveEstimations();
+        renderEstimations();
       });
-    </script>
+    });
+  }
+
+  function saveEstimations() {
+    localStorage.setItem('estimationsData', JSON.stringify(savedEstimations));
+  }
+</script>
+
   </body>
 </html>
