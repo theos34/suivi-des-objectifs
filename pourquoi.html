@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Stitch Design</title>
+  </head>
+  <body class="bg-gray-50 font-sans">
+       <header class="flex items-center justify-between border-b border-[#f2f2f2] px-10 py-3">
+  <h2 class="text-lg font-bold tracking-[-0.015em]">Suivi des Objectifs</h2>
+  <nav class="flex gap-6">
+    <a href="index.html" class="text-sm font-medium hover:underline">Mes Objectifs</a>
+    <a href="revenus.html" class="text-sm font-medium hover:underline">Revenus</a>
+    <a href="estimation-revenus.html" class="text-sm font-medium hover:underline">Estimation Revenus</a>
+    <a href="pourquoi.html" class="text-sm font-medium hover:underline">Mon pourquoi</a> <!-- Page Pourquoi -->
+  </nav>
+  <a href="https://bento.me/theoserra" target="_blank" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm">Suivre le Créateur</a>
+</header>
+
+    <div class="flex flex-col min-h-screen items-center justify-center p-4">
+      <h2 id="headline" class="text-[#101419] text-2xl font-bold text-center pb-2">
+        Entrez la raison du pourquoi vous souhaitez atteindre vos objectifs & pourquoi vous avez commencé.
+      </h2>
+      <br>
+      <p id="publishDate" class="text-[#6b7280] text-sm text-center pb-4 hidden"></p>
+      <div class="w-full">
+        <textarea
+          id="quoteInput"
+          placeholder="Écrivez votre citation ici..."
+          class="w-full min-h-36 rounded-xl border border-[#d3dbe4] bg-gray-50 p-4 text-base text-[#101419] placeholder-[#58728d] focus:outline-none focus:ring-0 focus:border-[#d3dbe4] resize-none"
+        ></textarea>
+      </div>
+      <div class="w-full flex justify-center mt-4">
+        <button
+          id="saveButton"
+          class="h-10 px-4 rounded-xl bg-[#d2e2f3] text-[#101419] text-sm font-bold"
+        >
+          Enregistrer
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const saveButton = document.getElementById("saveButton");
+      const quoteInput = document.getElementById("quoteInput");
+      const headline = document.getElementById("headline");
+      const publishDate = document.getElementById("publishDate");
+
+      saveButton.addEventListener("click", () => {
+        const quote = quoteInput.value.trim();
+        if (quote.length > 0) {
+          headline.textContent = quote;
+          const now = new Date();
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          const dateStr = now.toLocaleDateString('fr-FR', options);
+          publishDate.textContent = `Publié le ${dateStr}`;
+          publishDate.classList.remove("hidden");
+          quoteInput.value = "";
+        }
+      });
+    </script>
+  </body>
+</html>
