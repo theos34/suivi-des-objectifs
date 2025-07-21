@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Estimation Revenus</title>
+    <title>Projection du Mois</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -22,7 +22,7 @@
 
     <main class="flex-1 flex flex-col items-center justify-center p-6">
       <div class="bg-white rounded-2xl border border-[#dde1e3] w-full max-w-md p-6 space-y-4">
-        <h1 class="text-2xl font-bold text-center">Estimez vos revenus</h1>
+        <h1 class="text-2xl font-bold text-center">Projection du Mois</h1>
         <input id="business-name" type="text" placeholder="Nom du Business" class="border border-[#dde1e3] rounded-xl p-3 focus:ring-2 focus:ring-[#dce8f3] focus:outline-none w-full" />
         <input id="panier-moyen" type="number" placeholder="Panier Moyen (€)" class="border border-[#dde1e3] rounded-xl p-3 focus:ring-2 focus:ring-[#dce8f3] focus:outline-none w-full" />
         <input id="clients" type="number" placeholder="Nombre de Clients" class="border border-[#dde1e3] rounded-xl p-3 focus:ring-2 focus:ring-[#dce8f3] focus:outline-none w-full" />
@@ -49,7 +49,7 @@
     </main>
 
     <script>
-      const STORAGE_KEY = 'estimationsData';
+      const STORAGE_KEY = 'projectionData';
       let savedEstimations = [];
 
       window.onload = function () {
